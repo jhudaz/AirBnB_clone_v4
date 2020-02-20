@@ -1,5 +1,6 @@
 $(document).ready(function () {
   const dict = {};
+  let users;
   $('input[type=checkbox]').click(function () {
     // all amenities
     if ($(this).is(':checked')) {
@@ -17,7 +18,19 @@ $(document).ready(function () {
       element.append('<br/>');
     }
   });
-  // request
+  // request users
+  $.ajax({
+    type: 'GET',
+    url: 'http://0.0.0.0:5001/api/v1/users/',
+    dataType: 'json',
+    success: function (data) {
+      users = data;
+    },
+    error: function () {
+      $('DIV#api_status').removeClass('available');
+    }
+  });
+  // request places
   $.ajax({
     type: 'POST',
     url: 'http://0.0.0.0:5001/api/v1/places_search/',
@@ -52,7 +65,10 @@ $(document).ready(function () {
               </div>
           </div>
           <div class="user">
-              <strong>Owner: </strong>
+            <strong>Owner: 
+              ${users.find(user => (user.id === place.user_id)).first_name}
+              ${users.find(user => (user.id === place.user_id)).last_name}
+            </strong>
           </div>
           <div class="description">
               ${place.description}
